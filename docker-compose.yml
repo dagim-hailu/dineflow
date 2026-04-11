@@ -11,7 +11,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dineflow_password}
       POSTGRES_DB: ${POSTGRES_DB:-dineflow}
     ports:
-      - "5432:5432"
+      - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
@@ -21,7 +21,7 @@ services:
     container_name: dineflow-redis
     restart: always
     ports:
-      - "6379:6379"
+      - '6379:6379'
     volumes:
       - redis_data:/data
 
@@ -34,8 +34,8 @@ services:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minio_admin}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minio_password}
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - '9000:9000'
+      - '9001:9001'
     command: server /data --console-address ":9001"
     volumes:
       - minio_data:/data
@@ -56,7 +56,7 @@ services:
       MINIO_ACCESS_KEY: ${MINIO_ROOT_USER:-minio_admin}
       MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-minio_password}
     ports:
-      - "3001:3001"
+      - '3001:3001'
     depends_on:
       - postgres
       - redis
@@ -73,7 +73,7 @@ services:
       PORT: 3000
       NEXT_PUBLIC_API_URL: http://localhost:3001/graphql
     ports:
-      - "3000:3000"
+      - '3000:3000'
     depends_on:
       - api
 

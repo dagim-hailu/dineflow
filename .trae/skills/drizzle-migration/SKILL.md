@@ -27,10 +27,21 @@ Naming conventions: snake_case for tables and columns.
 Example:
 
 ```typescript
-export const newTable = pgTable("new_table", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  name: varchar("name", { length: 255 }).notNull(),
-  createdAt: timestamp("created_at").defaultNow(),
+export const newTable = pgTable('new_table', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  name: varchar('name', { length: 255 }).notNull(),
+  createdAt: timestamp('created_at').defaultNow(),
 });
+
+2. Generate Migration
+Run in apps/api directory:
+pnpm drizzle-kit generate
+
+3. Apply Migration
+pnpm drizzle-kit migrate
+
+4. Update Types
+Run GraphQL Codegen to update generated types:
+pnpm graphql-codegen
 ```
 ````

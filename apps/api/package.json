@@ -7,7 +7,8 @@
     "build": "nest build",
     "start": "node dist/main",
     "lint": "eslint . --max-warnings 0",
-    "test": "vitest run"
+    "test": "vitest run",
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "@apollo/server": "^4.10.1",

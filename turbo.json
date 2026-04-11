@@ -15,7 +15,7 @@
       "dependsOn": ["^lint"]
     },
     "test": {
-      "dependsOn": [],
+      "dependsOn": ["type-check"],
       "inputs": [
         "**/*.test.ts",
         "**/*.test.tsx",
@@ -25,7 +25,8 @@
       ]
     },
     "type-check": {
-      "dependsOn": ["^type-check"]
+      "dependsOn": ["^type-check"],
+      "cache": true
     },
     "db:generate": {
       "cache": false

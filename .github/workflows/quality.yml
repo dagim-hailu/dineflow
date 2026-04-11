@@ -14,10 +14,12 @@ jobs:
       - uses: pnpm/action-setup@v4
         with:
           version: 9
+      - run: pnpm config set registry https://registry.npmmirror.com/
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: pnpm
+          registry-url: 'https://registry.npmmirror.com/'
       - run: pnpm install --frozen-lockfile
       - run: pnpm format:check
 
@@ -28,10 +30,12 @@ jobs:
       - uses: pnpm/action-setup@v4
         with:
           version: 9
+      - run: pnpm config set registry https://registry.npmmirror.com/
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: pnpm
+          registry-url: 'https://registry.npmmirror.com/'
       - run: pnpm install --frozen-lockfile
       - run: pnpm test
 
@@ -44,10 +48,12 @@ jobs:
       - uses: pnpm/action-setup@v4
         with:
           version: 9
+      - run: pnpm config set registry https://registry.npmmirror.com/
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: pnpm
+          registry-url: 'https://registry.npmmirror.com/'
       - run: pnpm install --frozen-lockfile
       - run: |
           if [ "${{ github.event_name }}" = "pull_request" ]; then

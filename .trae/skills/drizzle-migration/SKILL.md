@@ -1,47 +1,55 @@
-### Skill 3: Drizzle Database Migration
-
-**File Path:** `.trae/skills/drizzle-migration/SKILL.md`
-
-````markdown
 ---
-name: drizzle-migration
-description: Standardized workflow for generating and managing database migrations using Drizzle ORM.
-globs: apps/api/src/infrastructure/database/schema.ts
-alwaysApply: false
+name: 'drizzle-migration'
+description: 'Creates Drizzle ORM database schema and migrations for PostgreSQL. Invoke when setting up database schema or when user asks for database migrations.'
 ---
 
-# Generate Drizzle Database Migration
+# Drizzle Migration Skill
 
-## Trigger Conditions
+This skill creates complete Drizzle ORM database schema definitions and generates migrations for PostgreSQL databases.
 
-Trigger when user says "update database structure," "add new table/field," "generate migration file."
+## When to Use
+
+- When setting up a new database schema
+- When adding new tables or modifying existing schema
+- When user requests database migrations
+- When implementing database changes from system design documents
 
 ## Execution Flow
 
-### 1. Modify Schema
+### 1. Create Schema Definition
 
-Add/modify table definitions in `apps/api/src/infrastructure/database/schema.ts`.
+Create `apps/api/src/infrastructure/database/schema.ts` with:
 
-Naming conventions: snake_case for tables and columns.
+- Complete table definitions using Drizzle ORM
+- Proper foreign key relationships
+- Indexes for performance
+- Enum types where needed
 
-Example:
+### 2. Generate Migration Files
 
-```typescript
-export const newTable = pgTable('new_table', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  name: varchar('name', { length: 255 }).notNull(),
-  createdAt: timestamp('created_at').defaultNow(),
-});
+Run Drizzle Kit to generate migration files:
 
-2. Generate Migration
-Run in apps/api directory:
+```bash
 pnpm drizzle-kit generate
-
-3. Apply Migration
-pnpm drizzle-kit migrate
-
-4. Update Types
-Run GraphQL Codegen to update generated types:
-pnpm graphql-codegen
 ```
-````
+
+### 3. Apply Migrations
+
+Apply migrations to development database:
+
+```bash
+pnpm drizzle-kit migrate
+```
+
+### 4. Database Service Setup
+
+Create database service with connection pooling and query methods.
+
+## Schema Guidelines
+
+- Use snake_case for table and column names
+- Define proper constraints (NOT NULL, UNIQUE, etc.)
+- Include created_at/updated_at timestamps
+- Use UUID primary keys
+- Define proper foreign key relationships
+- Add indexes for frequently queried columns

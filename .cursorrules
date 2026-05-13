@@ -1,0 +1,42 @@
+# DineFlow Project Rules for Cursor AI
+
+## Project Overview
+- **Name:** DineFlow v2.1
+- **Stack:** Turborepo + Next.js 15 (App Router) + NestJS 10 + GraphQL + PostgreSQL + Drizzle ORM + Redis + Tailwind + shadcn/ui
+- **Package Manager:** pnpm
+
+## Folder Structure
+- Frontend: `apps/web/` (no `src/` folder—files directly under `app/`, `components/`, `lib/`, `store/`, `hooks/`)
+- Backend: `apps/api/`
+- Documentation: `docs/`
+
+## Coding Standards
+- TypeScript strict mode—NO `any` without comment justification
+- File naming: kebab-case (`user-profile.tsx`)
+- Components: PascalCase (`MenuItemCard`)
+- Functions: camelCase (`calculateTotalPrice`)
+- Database tables/columns: snake_case
+
+## Design System (Mobile-First)
+- Primary color: `#F59E0B` (orange)
+- Dark background: `#0F172A`
+- Touch targets: ≥44px
+- Modals: bottom sheets on mobile
+- Toasts: `sonner`, positioned bottom-center
+
+## Important Constraints
+- NEVER create a `src/` folder—all frontend code goes directly under `apps/web/`
+- Use absolute paths in file operations: `/home/dhz/PROJECTS/our/dineflow/apps/web/...`
+- Preserve existing working code; only fix what's broken
+- Read documentation in `docs/` before making major changes
+
+## Current State (As of Migration from TRAE)
+- Backend: Fully complete (Auth, Menu, Order, WebSocket modules) running on port 3001
+- Frontend: 95% complete—missing homepage menu backend connection, some testing
+- Dev server: `pnpm dev` starts both web (3000) and api (3001)
+
+## When Generating Code
+- Follow the patterns in existing files
+- Use shadcn/ui components from `apps/web/components/ui/`
+- Use Zustand stores from `apps/web/store/`
+- Use Apollo Client configured in `apps/web/lib/apollo-client.ts`

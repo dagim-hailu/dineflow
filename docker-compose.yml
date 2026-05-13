@@ -1,81 +1,140 @@
-version: '3.8'
+name: dineflow
+
+networks:
+  dineflow-network:
+    driver: bridge
 
 services:
-  # Database: PostgreSQL
   postgres:
-    image: postgres:16-alpine
+    image: postgres:15-alpine
     container_name: dineflow-postgres
-    restart: always
+    restart: unless-stopped
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-dineflow}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dineflow_password}
-      POSTGRES_DB: ${POSTGRES_DB:-dineflow}
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: dineflow
     ports:
       - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d dineflow']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - dineflow-network
 
-  # Cache: Redis
   redis:
     image: redis:7-alpine
     container_name: dineflow-redis
-    restart: always
+    restart: unless-stopped
     ports:
       - '6379:6379'
     volumes:
       - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - dineflow-network
 
-  # Object Storage: MinIO
   minio:
-    image: minio/minio
+    image: minio/minio:latest
     container_name: dineflow-minio
-    restart: always
+    restart: unless-stopped
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minio_admin}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minio_password}
     ports:
       - '9000:9000'
       - '9001:9001'
-    command: server /data --console-address ":9001"
     volumes:
       - minio_data:/data
+    command: server /data --console-address ":9001"
+    networks:
+      - dineflow-network
 
-  # NestJS API
   api:
     build:
       context: .
       dockerfile: apps/api/Dockerfile
     container_name: dineflow-api
-    restart: always
+    working_dir: /app/apps/api
+    restart: unless-stopped
     environment:
+      NODE_ENV: production
       PORT: 3001
-      DATABASE_URL: postgresql://${POSTGRES_USER:-dineflow}:${POSTGRES_PASSWORD:-dineflow_password}@postgres:5432/${POSTGRES_DB:-dineflow}?schema=public
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/dineflow?schema=public
       REDIS_URL: redis://redis:6379
+      JWT_SECRET: ${JWT_SECRET:-change-me-in-production-use-long-random-string}
+      GUEST_TOKEN_SECRET: ${GUEST_TOKEN_SECRET:-change-me-guest-secret}
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
       MINIO_ENDPOINT: minio
       MINIO_PORT: 9000
       MINIO_ACCESS_KEY: ${MINIO_ROOT_USER:-minio_admin}
       MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-minio_password}
-    ports:
-      - '3001:3001'
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost,http://localhost:80,http://localhost:3000,http://127.0.0.1,http://127.0.0.1:80,http://127.0.0.1:3000}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost}
+      GRAPHQL_PLAYGROUND: ${GRAPHQL_PLAYGROUND:-true}
+      GRAPHQL_INTROSPECTION: ${GRAPHQL_INTROSPECTION:-true}
+      SWAGGER_ENABLED: ${SWAGGER_ENABLED:-true}
+    expose:
+      - '3001'
     depends_on:
-      - postgres
-      - redis
-      - minio
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_started
+    networks:
+      - dineflow-network
 
-  # Next.js Web
   web:
     build:
       context: .
       dockerfile: apps/web/Dockerfile
+      network: host
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost/graphql}
+        NEXT_PUBLIC_WS_URL: ${NEXT_PUBLIC_WS_URL:-ws://localhost/events}
     container_name: dineflow-web
-    restart: always
+    restart: unless-stopped
     environment:
+      NODE_ENV: production
       PORT: 3000
-      NEXT_PUBLIC_API_URL: http://localhost:3001/graphql
-    ports:
-      - '3000:3000'
+      HOSTNAME: 0.0.0.0
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost/graphql}
+      NEXT_PUBLIC_WS_URL: ${NEXT_PUBLIC_WS_URL:-ws://localhost/events}
+      NEXTAUTH_URL: ${NEXTAUTH_URL:-http://localhost}
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET:-dineflow-docker-dev-nextauth-secret-change-me-32chars-min}
+      AUTH_TRUST_HOST: 'true'
+      INTERNAL_GRAPHQL_URL: ${INTERNAL_GRAPHQL_URL:-http://api:3001/graphql}
+    expose:
+      - '3000'
     depends_on:
       - api
+    networks:
+      - dineflow-network
+
+  nginx:
+    image: nginx:alpine
+    container_name: dineflow-nginx
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - web
+      - api
+    networks:
+      - dineflow-network
 
 volumes:
   postgres_data:

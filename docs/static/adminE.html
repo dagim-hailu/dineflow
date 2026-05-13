@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Menu Admin Dashboard</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .admin-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      overflow: hidden;
+    }
+
+    .admin-header {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      color: white;
+      padding: 30px;
+      text-align: center;
+    }
+
+    .admin-header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+    }
+
+    .admin-header p {
+      opacity: 0.9;
+      font-size: 1.1rem;
+    }
+
+    .qr-section {
+      background: #f8f9fa;
+      padding: 20px;
+      text-align: center;
+      border-bottom: 2px dashed #ddd;
+    }
+
+    .qr-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: white;
+      padding: 12px 25px;
+      border-radius: 50px;
+      text-decoration: none;
+      color: #f5576c;
+      font-weight: bold;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      transition: transform 0.3s;
+    }
+
+    .qr-link:hover {
+      transform: translateY(-3px);
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      min-height: 800px;
+    }
+
+    @media (max-width: 992px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .form-section {
+      padding: 40px;
+      background: white;
+      border-right: 2px dashed #eee;
+    }
+
+    .form-section h2 {
+      color: #333;
+      margin-bottom: 30px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.8rem;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    @media (max-width: 768px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group.full-width {
+      grid-column: span 2;
+    }
+
+    @media (max-width: 768px) {
+      .form-group.full-width {
+        grid-column: span 1;
+      }
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #555;
+      font-size: 0.9rem;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 14px;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      font-size: 16px;
+      transition: all 0.3s;
+      background: #f8f9fa;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: #f5576c;
+      background: white;
+      box-shadow: 0 0 0 3px rgba(245, 87, 108, 0.1);
+    }
+
+    .image-upload {
+      border: 3px dashed #ddd;
+      padding: 25px;
+      text-align: center;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s;
+      background: #f8f9fa;
+    }
+
+    .image-upload:hover {
+      border-color: #f5576c;
+      background: #fff5f7;
+    }
+
+    .image-upload input[type="file"] {
+      display: none;
+    }
+
+    .upload-label {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      color: #666;
+    }
+
+    .image-preview {
+      margin-top: 15px;
+    }
+
+    .image-preview img {
+      width: 150px;
+      height: 150px;
+      object-fit: cover;
+      border-radius: 10px;
+      border: 3px solid white;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 15px;
+      margin-top: 30px;
+    }
+
+    .form-actions button {
+      flex: 1;
+      padding: 16px;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 20px rgba(245, 87, 108, 0.3);
+    }
+
+    .btn-secondary {
+      background: #6c757d;
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background: #5a6268;
+      transform: translateY(-2px);
+    }
+
+    .items-section {
+      padding: 40px;
+      background: #f8f9fa;
+      overflow-y: auto;
+      max-height: 800px;
+    }
+
+    .items-section h2 {
+      color: #333;
+      margin-bottom: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 1.8rem;
+    }
+
+    .item-count {
+      background: #f5576c;
+      color: white;
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+    }
+
+    .items-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    .item-card {
+      background: white;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+      transition: all 0.3s;
+    }
+
+    .item-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+    }
+
+    .item-image {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+    }
+
+    .item-content {
+      padding: 20px;
+    }
+
+    .item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 10px;
+    }
+
+    .item-name {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #333;
+    }
+
+    .item-price {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      color: white;
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-weight: bold;
+      font-size: 1.1rem;
+    }
+
+    .item-category {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .category-food {
+      background: #e3f2fd;
+      color: #1976d2;
+    }
+
+    .category-drink {
+      background: #f3e5f5;
+      color: #7b1fa2;
+    }
+
+    .item-description {
+      color: #666;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      margin-bottom: 15px;
+      min-height: 40px;
+    }
+
+    .item-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .item-actions button {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+    }
+
+    .btn-edit {
+      background: #2196f3;
+      color: white;
+    }
+
+    .btn-edit:hover {
+      background: #1976d2;
+      transform: translateY(-2px);
+    }
+
+    .btn-delete {
+      background: #f44336;
+      color: white;
+    }
+
+    .btn-delete:hover {
+      background: #d32f2f;
+      transform: translateY(-2px);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #999;
+    }
+
+    .empty-state img {
+      width: 150px;
+      opacity: 0.5;
+      margin-bottom: 20px;
+    }
+
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 15px 25px;
+      border-radius: 10px;
+      color: white;
+      font-weight: 600;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      transform: translateX(400px);
+      transition: transform 0.3s;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .notification.show {
+      transform: translateX(0);
+    }
+
+    .notification.success {
+      background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
+    }
+
+    .notification.warning {
+      background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+    }
+
+    .notification.error {
+      background: linear-gradient(135deg, #F44336 0%, #C62828 100%);
+    }
+
+    .notification.info {
+      background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+    }
+  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="admin-container">
+    <!-- Header -->
+    <div class="admin-header">
+      <h1><i class="fas fa-crown"></i> Menu Admin Dashboard</h1>
+      <p>Manage your digital menu items and categories</p>
+    </div>
+
+    <!-- QR Code Link -->
+    <div class="qr-section">
+      <a href="index.html" class="qr-link" target="_blank">
+        <i class="fas fa-external-link-alt"></i>
+        View Customer Menu →
+      </a>
+    </div>
+
+    <!-- Dashboard Grid -->
+    <div class="dashboard-grid">
+      <!-- Left: Form Section -->
+      <div class="form-section">
+        <h2><i class="fas fa-edit"></i> <span id="formTitle">Add New Item</span></h2>
+        
+        <form id="menuForm">
+          <input type="hidden" id="itemId">
+          
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="name"><i class="fas fa-utensils"></i> Item Name *</label>
+              <input type="text" id="name" placeholder="e.g., Margherita Pizza" required>
+            </div>
+            
+            <div class="form-group">
+              <label for="price"><i class="fas fa-tag"></i> Price ($) *</label>
+              <input type="number" id="price" placeholder="12.99" step="0.01" min="0" required>
+            </div>
+            
+            <div class="form-group">
+              <label for="category"><i class="fas fa-filter"></i> Category *</label>
+              <select id="category" required>
+                <option value="">Select Category</option>
+                <option value="Popular Breakfast">🍳 Popular Breakfast</option>
+                <option value="Special Launch">🚀 Special Launch</option>
+                <option value="Lovely Dinner">🌙 Lovely Dinner</option>
+                <option value="Food">🍔 Food</option>
+                <option value="Drink">🥤 Drink</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="description"><i class="fas fa-align-left"></i> Description</label>
+            <textarea id="description" placeholder="Describe your delicious item..." rows="3">Ipsum ipsum clita erat amet dolor justo diam</textarea>
+          </div>
+          
+          <div class="form-group">
+            <label><i class="fas fa-image"></i> Item Image</label>
+            <div class="image-upload">
+              <label class="upload-label">
+                <i class="fas fa-cloud-upload-alt fa-3x"></i>
+                <span>Click to upload image</span>
+                <small>Recommended: 400x300px</small>
+                <input type="file" id="image" accept="image/*">
+              </label>
+            </div>
+            <div class="image-preview" id="imagePreview"></div>
+          </div>
+          
+          <div class="form-actions">
+            <button type="submit" class="btn-primary">
+              <i class="fas fa-save"></i>
+              <span id="submitBtnText">Save Item</span>
+            </button>
+            <button type="button" id="cancelBtn" class="btn-secondary">
+              <i class="fas fa-times"></i>
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+      
+      <!-- Right: Items List -->
+      <div class="items-section">
+        <h2>
+          <i class="fas fa-list"></i> Menu Items
+          <span class="item-count" id="itemCount">0 items</span>
+        </h2>
+        
+        <div class="items-grid" id="itemsGrid">
+          <!-- Items will be loaded here -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notification -->
+  <div class="notification" id="notification"></div>
+
+  <script>
+    // Initialize menu with some default items
+    let menu = JSON.parse(localStorage.getItem("menu")) || [
+      {
+        id: 1,
+        name: "Pizza traces",
+        price: 115,
+        category: "Popular Breakfast",
+        description: "Ipsum ipsum clita erat amet dolor justo diam",
+        image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400&h=300&fit=crop"
+      },
+      {
+        id: 2,
+        name: "Chicken Burger",
+        price: 115,
+        category: "Special Launch",
+        description: "Ipsum ipsum clita erat amet dolor justo diam",
+        image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w-400&h=300&fit=crop"
+      },
+      {
+        id: 3,
+        name: "Special samosas",
+        price: 115,
+        category: "Lovely Dinner",
+        description: "Ipsum ipsum clita erat amet dolor justo diam",
+        image: "https://images.unsplash.com/photo-1589302168068-964664d93dc0?w-400&h=300&fit=crop"
+      },
+      {
+        id: 4,
+        name: "Fried Chicken",
+        price: 115,
+        category: "Popular Breakfast",
+        description: "Ipsum ipsum clita erat amet dolor justo diam",
+        image: "https://images.unsplash.com/photo-1626645738196-c2a7c87a8f58?w-400&h=300&fit=crop"
+      }
+    ];
+
+    // Save initial menu if empty
+    if (!localStorage.getItem("menu")) {
+      localStorage.setItem("menu", JSON.stringify(menu));
+    }
+
+    // DOM Elements
+    const form = document.getElementById("menuForm");
+    const itemsGrid = document.getElementById("itemsGrid");
+    const itemCount = document.getElementById("itemCount");
+    const imageInput = document.getElementById("image");
+    const imagePreview = document.getElementById("imagePreview");
+    const cancelBtn = document.getElementById("cancelBtn");
+    const formTitle = document.getElementById("formTitle");
+    const submitBtnText = document.getElementById("submitBtnText");
+    const notification = document.getElementById("notification");
+
+    // Form submission
+    form.addEventListener("submit", async function(e) {
+      e.preventDefault();
+      
+      const id = document.getElementById("itemId").value;
+      const name = document.getElementById("name").value.trim();
+      const price = parseFloat(document.getElementById("price").value);
+      const category = document.getElementById("category").value;
+      const description = document.getElementById("description").value.trim();
+      const isEditMode = !!id;
+      
+      // Validation
+      if (!name || !price || !category) {
+        showNotification("Please fill in all required fields", "warning");
+        return;
+      }
+      
+      if (price <= 0) {
+        showNotification("Price must be greater than 0", "warning");
+        return;
+      }
+
+      // Handle image
+      let imageUrl = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&h=300&fit=crop';
+      
+      if (imageInput.files[0]) {
+        imageUrl = await readFileAsDataURL(imageInput.files[0]);
+      } else if (isEditMode) {
+        const existingItem = menu.find(item => item.id == id);
+        imageUrl = existingItem ? existingItem.image : imageUrl;
+      }
+
+      // Save item
+      if (isEditMode) {
+        const index = menu.findIndex(item => item.id == id);
+        if (index !== -1) {
+          menu[index] = { ...menu[index], name, price, category, description, image: imageUrl };
+          showNotification(`✅ ${name} updated successfully!`, "success");
+        }
+      } else {
+        const newItem = {
+          id: Date.now(),
+          name,
+          price,
+          category,
+          description,
+          image: imageUrl
+        };
+        menu.push(newItem);
+        showNotification(`✅ ${name} added to menu!`, "success");
+      }
+      
+      // Update storage and UI
+      localStorage.setItem("menu", JSON.stringify(menu));
+      resetForm();
+      renderMenu();
+    });
+
+    // Image preview
+    imageInput.addEventListener("change", async function() {
+      if (this.files[0]) {
+        const url = await readFileAsDataURL(this.files[0]);
+        imagePreview.innerHTML = `<img src="${url}" alt="Preview">`;
+      }
+    });
+
+    // Render menu items
+    function renderMenu() {
+      itemCount.textContent = `${menu.length} ${menu.length === 1 ? 'item' : 'items'}`;
+      
+      if (menu.length === 0) {
+        itemsGrid.innerHTML = `
+          <div class="empty-state">
+            <img src="https://cdn-icons-png.flaticon.com/512/4076/4076478.png" alt="No items">
+            <h3>No menu items yet</h3>
+            <p>Start by adding your first item using the form</p>
+          </div>
+        `;
+        return;
+      }
+      
+      // Sort by category
+      const categories = {};
+      menu.forEach(item => {
+        if (!categories[item.category]) {
+          categories[item.category] = [];
+        }
+        categories[item.category].push(item);
+      });
+      
+      let html = '';
+      
+      for (const [category, items] of Object.entries(categories)) {
+        html += `<div style="grid-column: 1 / -1; margin: 20px 0 10px; font-size: 1.2rem; color: #666; border-bottom: 2px solid #eee; padding-bottom: 5px;">
+                  <i class="fas fa-folder"></i> ${category}
+                </div>`;
+        
+        items.forEach(item => {
+          const categoryClass = item.category.includes('Food') ? 'category-food' : 
+                               item.category.includes('Drink') ? 'category-drink' : 'category-food';
+          
+          html += `
+            <div class="item-card">
+              <img src="${item.image}" alt="${item.name}" class="item-image" 
+                   onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&h=300&fit=crop'">
+              <div class="item-content">
+                <div class="item-header">
+                  <div class="item-name">${item.name}</div>
+                  <div class="item-price">$${item.price}</div>
+                </div>
+                <div class="${categoryClass} item-category">${item.category}</div>
+                <div class="item-description">${item.description}</div>
+                <div class="item-actions">
+                  <button class="btn-edit" onclick="editItem(${item.id})">
+                    <i class="fas fa-edit"></i> Edit
+                  </button>
+                  <button class="btn-delete" onclick="deleteItem(${item.id})">
+                    <i class="fas fa-trash"></i> Delete
+                  </button>
+                </div>
+              </div>
+            </div>
+          `;
+        });
+      }
+      
+      itemsGrid.innerHTML = html;
+    }
+
+    // Edit item
+    function editItem(id) {
+      const item = menu.find(i => i.id == id);
+      if (item) {
+        document.getElementById("itemId").value = item.id;
+        document.getElementById("name").value = item.name;
+        document.getElementById("price").value = item.price;
+        document.getElementById("category").value = item.category;
+        document.getElementById("description").value = item.description;
+        
+        formTitle.textContent = `Edit: ${item.name}`;
+        submitBtnText.textContent = 'Update Item';
+        
+        imagePreview.innerHTML = `<img src="${item.image}" alt="Current image">`;
+        
+        showNotification(`Editing: ${item.name} - $${item.price}`, "info");
+        
+        // Scroll to form
+        document.querySelector('.form-section').scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+
+    // Delete item
+    function deleteItem(id) {
+      const item = menu.find(i => i.id == id);
+      if (!item) return;
+      
+      if (confirm(`Delete "${item.name}"?\nThis will remove it from your menu.`)) {
+        menu = menu.filter(item => item.id !== id);
+        localStorage.setItem("menu", JSON.stringify(menu));
+        renderMenu();
+        resetForm();
+        showNotification(`🗑️ ${item.name} removed from menu`, "error");
+      }
+    }
+
+    // Reset form
+    function resetForm() {
+      form.reset();
+      document.getElementById("itemId").value = "";
+      formTitle.textContent = "Add New Item";
+      submitBtnText.textContent = "Save Item";
+      imagePreview.innerHTML = "";
+    }
+
+    // Cancel button
+    cancelBtn.addEventListener("click", resetForm);
+
+    // File reader helper
+    function readFileAsDataURL(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = e => resolve(e.target.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // Show notification
+    function showNotification(message, type) {
+      notification.textContent = message;
+      notification.className = `notification ${type}`;
+      notification.classList.add('show');
+      
+      setTimeout(() => {
+        notification.classList.remove('show');
+      }, 3000);
+    }
+
+    // Initial render
+    renderMenu();
+  </script>
+</body>
+</html>

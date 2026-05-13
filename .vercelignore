@@ -1,0 +1,8 @@
+dineflow.rar
+dineflow_V2.rar
+node_modules
+.git
+.turbo
+.next
+apps/**/node_modules
+**/*.log

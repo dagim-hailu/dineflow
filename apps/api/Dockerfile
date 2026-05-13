@@ -1,59 +1,50 @@
-FROM node:22-alpine AS base
+# --- Stage 1: build NestJS API ---
+FROM node:18-alpine AS builder
 
-# Install pnpm
-ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
-RUN corepack enable
-RUN pnpm config set registry https://registry.npmmirror.com/
-
-# --- STAGE: PRUNE ---
-FROM base AS pruner
-RUN pnpm add -g turbo
-WORKDIR /app
-COPY . .
-RUN turbo prune api --docker
-
-# --- STAGE: INSTALL ---
-FROM base AS installer
 WORKDIR /app
 
-# First copy the pruned package.json and pnpm-lock.yaml
-COPY --from=pruner /app/out/json/ .
-COPY --from=pruner /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
+RUN npm install -g pnpm@9.0.0 && pnpm config set registry https://registry.npmjs.org/
 
-# Install dependencies
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY apps/api ./apps/api
+COPY packages ./packages
+
 RUN pnpm install --frozen-lockfile
+RUN pnpm --filter api build
 
-# --- STAGE: BUILD ---
-FROM base AS builder
-WORKDIR /app
-COPY --from=installer /app/ .
-COPY --from=pruner /app/out/full/ .
-COPY turbo.json turbo.json
+# --- Stage 2: production ---
+FROM node:18-alpine AS production
 
-# Build the project
-RUN pnpm turbo run build --filter=api...
-
-# --- STAGE: RUNNER ---
-FROM base AS runner
 WORKDIR /app
 
-# Don't run production as root
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nestjs
-USER nestjs
+ENV HUSKY=0
 
+RUN npm install -g pnpm@9.0.0 \
+  && pnpm config set registry https://registry.npmjs.org/ \
+  && apk add --no-cache netcat-openbsd python3 make g++
+
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+# Root `prepare` runs `husky`, which is not installed with `--prod`
+RUN node -e "\
+  const fs=require('fs');\
+  const p=JSON.parse(fs.readFileSync('package.json','utf8'));\
+  if (p.scripts?.prepare) delete p.scripts.prepare;\
+  fs.writeFileSync('package.json', JSON.stringify(p,null,2)+'\\n');\
+"
+COPY apps/api/package.json ./apps/api/package.json
+
+RUN pnpm install --frozen-lockfile --prod --filter ./apps/api...
+
+# pnpm links runtime deps under `apps/api/node_modules`; run `node dist/main.js` from that directory.
 COPY --from=builder /app/apps/api/dist ./apps/api/dist
-COPY --from=builder /app/apps/api/package.json ./apps/api/package.json
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/apps/api/node_modules ./apps/api/node_modules
+COPY apps/api/docker-entrypoint.sh /docker-entrypoint.sh
+COPY apps/api/drizzle.push-docker.cjs /drizzle.push-docker.cjs
+COPY apps/api/src/infrastructure/database ./apps/api/src/infrastructure/database
 
-# We need the root package.json for some reason?
-# COPY --from=builder /app/package.json ./package.json
+RUN chmod +x /docker-entrypoint.sh
 
 EXPOSE 3001
+ENV NODE_ENV=production
+ENV PORT=3001
 
-ENV PORT 3001
-ENV NODE_ENV production
-
-CMD ["node", "apps/api/dist/main"]
+ENTRYPOINT ["/docker-entrypoint.sh"]

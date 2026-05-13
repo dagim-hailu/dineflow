@@ -76,3 +76,13 @@
 - Passwords must be hashed with bcrypt
 - JWT secrets must not be hardcoded
 - API endpoints must implement rate limiting
+
+## shadcn/ui Initialization Requirement
+
+Before generating any UI components, ALWAYS ensure:
+
+1. The `src/lib/utils.ts` file exists with the `cn` function.
+2. Required dependencies (`clsx`, `tailwind-merge`, `class-variance-authority`, `lucide-react`) are in `package.json`.
+3. The `globals.css` contains shadcn/ui CSS variables and `@tailwind` layers.
+4. The `components.json` file is present at the project root with proper configuration.
+5. `tailwind.config.js` includes shadcn/ui configuration (colors, dark mode, content paths).

@@ -1,0 +1,343 @@
+{
+  "info": {
+    "name": "DineFlow API",
+    "description": "DineFlow NestJS API: **REST** health + **OpenAPI/Swagger** at `/api/docs`, **GraphQL** at `POST /graphql`.\n\n1. Import **DineFlow-Local.postman_environment.json** and select it.\n2. Default **{{baseUrl}}** is `http://localhost` (Nginx in Docker). Use **{{baseUrlDirectApi}}** only if the API port is published to the host.\n3. Enable the **Postman cookie jar** for localhost so `login` / `register` / `guestSession` set `dineflow_token` / `dineflow_guest` for later GraphQL calls.\n4. Optionally paste a JWT into **{{accessToken}}** and use the **Authorization: Bearer** requests (cookies and Bearer both work where guards allow).\n5. Seeded demo: `test@example.com` / `password`, demo table UUID in **{{demoTableId}}**.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "dineflow"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost" },
+    { "key": "demoTableId", "value": "00000000-0000-4000-8000-000000000001" },
+    { "key": "restaurantId", "value": "a0000000-0000-4000-8000-000000000001" }
+  ],
+  "item": [
+    {
+      "name": "REST — Health & docs",
+      "item": [
+        {
+          "name": "GET Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/health",
+            "description": "Liveness JSON from Nest `HealthModule`."
+          },
+          "response": []
+        },
+        {
+          "name": "GET Swagger UI (browser)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/docs",
+            "description": "Open in a browser for interactive Swagger UI (HTML)."
+          },
+          "response": []
+        },
+        {
+          "name": "GET OpenAPI JSON",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/docs-json",
+            "description": "Raw OpenAPI 3 document for codegen or import into other tools."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "GraphQL — Public",
+      "item": [
+        {
+          "name": "hello",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"query { hello }\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{baseUrl}}/graphql"
+          },
+          "response": []
+        },
+        {
+          "name": "menu (by tableId)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"query Menu($tableId: ID!) { menu(tableId: $tableId) { categories { id name description items { id name description price isAvailable } } } }\",\n  \"variables\": { \"tableId\": \"{{demoTableId}}\" }\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{baseUrl}}/graphql"
+          },
+          "response": []
+        },
+        {
+          "name": "menuItem (by id)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"query Item($id: ID!) { menuItem(id: $id) { id name description price isAvailable } }\",\n  \"variables\": { \"id\": \"{{menuItemId}}\" }\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{baseUrl}}/graphql",
+            "description": "Set **menuItemId** in the environment (from `menu` response)."
+          },
+          "response": []
+        },
+        {
+          "name": "menuItemsByRestaurant",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"query Items($restaurantId: ID!) { menuItemsByRestaurant(restaurantId: $restaurantId) { id name price categoryId } }\",\n  \"variables\": { \"restaurantId\": \"{{restaurantId}}\" }\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{baseUrl}}/graphql"
+          },
+          "response": []
+        },
+        {
+          "name": "menuItemsByTable",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"query ByTable($tableId: ID!) { menuItemsByTable(tableId: $tableId) { id name price } }\",\n  \"variables\": { \"tableId\": \"{{demoTableId}}\" }\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{baseUrl}}/graphql"
+          },
+          "response": []
+        },
+        {
+          "name": "register",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"mutation Register($input: RegisterInput!) { register(input: $input) { user { id email displayName role } } }\",\n  \"variables\": {\n    \"input\": {\n      \"email\": \"newuser@example.com\",\n      \"password\": \"password123\",\n      \"displayName\": \"New User\",\n      \"role\": \"CUSTOMER\"\n    }\n  }\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{baseUrl}}/graphql",
+            "description": "Adjust email if already registered. Sets `dineflow_token` cookie when cookie jar is on."
+          },
+          "response": []
+        },
+        {
+          "name": "login",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"mutation Login($input: LoginInput!) { login(input: $input) { user { id email displayName role } } }\",\n  \"variables\": {\n    \"input\": {\n      \"email\": \"{{testEmail}}\",\n      \"password\": \"{{testPassword}}\"\n    }\n  }\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{baseUrl}}/graphql",
+            "description": "Seeded user: test@example.com / password (after `pnpm db:seed` or Docker seed)."
+          },
+          "response": []
+        },
+        {
+          "name": "guestSession",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"mutation Guest($input: GuestSessionInput!) { guestSession(input: $input) { token sessionId expiresAt } }\",\n  \"variables\": { \"input\": { \"tableId\": \"{{demoTableId}}\" } }\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{baseUrl}}/graphql",
+            "description": "Sets `dineflow_guest` cookie (15m)."
+          },
+          "response": []
+        },
+        {
+          "name": "order (by id) — requires OrderModule",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"query OneOrder($id: ID!) { order(id: $id) { id status } }\",\n  \"variables\": { \"id\": \"00000000-0000-4000-8000-000000000099\" }\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{baseUrl}}/graphql",
+            "description": "Resolver exists when `OrderModule` is imported in `AppModule`. Otherwise GraphQL returns \"Cannot query field\"."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "GraphQL — Authenticated (cookie or Bearer)",
+      "item": [
+        {
+          "name": "me (cookies)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"query { me { id email displayName role } }\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{baseUrl}}/graphql",
+            "description": "Requires `dineflow_token` or guest flow per API rules."
+          },
+          "response": []
+        },
+        {
+          "name": "me (Bearer {{accessToken}})",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"query { me { id email displayName role } }\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{baseUrl}}/graphql",
+            "description": "Paste JWT into environment **accessToken** if not using cookies."
+          },
+          "response": []
+        },
+        {
+          "name": "logout",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"mutation { logout }\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{baseUrl}}/graphql",
+            "description": "Clears auth cookies (when jar sends them)."
+          },
+          "response": []
+        },
+        {
+          "name": "createMenuItem (manager/admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"mutation Create($input: CreateMenuItemInput!) { createMenuItem(input: $input) { id name price restaurantId categoryId } }\",\n  \"variables\": {\n    \"input\": {\n      \"name\": \"API Test Item\",\n      \"description\": \"From Postman\",\n      \"price\": 9.99,\n      \"spicyLevel\": 0,\n      \"dietaryTags\": [],\n      \"displayOrder\": 99,\n      \"restaurantId\": \"{{restaurantId}}\",\n      \"categoryId\": \"{{categoryId}}\"\n    }\n  }\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{baseUrl}}/graphql",
+            "description": "Requires manager or admin JWT. Set **categoryId** from `menu` query."
+          },
+          "response": []
+        },
+        {
+          "name": "updateMenuItem",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"mutation Update($input: UpdateMenuItemInput!) { updateMenuItem(input: $input) { id name price isAvailable } }\",\n  \"variables\": {\n    \"input\": {\n      \"id\": \"{{menuItemId}}\",\n      \"name\": \"Updated name\",\n      \"price\": 10.5\n    }\n  }\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{baseUrl}}/graphql"
+          },
+          "response": []
+        },
+        {
+          "name": "toggleMenuItemAvailability",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"mutation Toggle($id: ID!) { toggleMenuItemAvailability(id: $id) { id isAvailable } }\",\n  \"variables\": { \"id\": \"{{menuItemId}}\" }\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{baseUrl}}/graphql"
+          },
+          "response": []
+        },
+        {
+          "name": "deleteMenuItem",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"mutation Del($id: ID!) { deleteMenuItem(id: $id) }\",\n  \"variables\": { \"id\": \"{{menuItemId}}\" }\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{baseUrl}}/graphql"
+          },
+          "response": []
+        },
+        {
+          "name": "refreshToken (throws — placeholder)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"mutation { refreshToken(token: \\\"placeholder\\\") { user { id } } }\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{baseUrl}}/graphql",
+            "description": "Resolver currently throws \"Refresh token not implemented\"."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "GraphQL — Introspection (dev)",
+      "item": [
+        {
+          "name": "schema types (small)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"query { __schema { queryType { name } mutationType { name } subscriptionType { name } } }\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{baseUrl}}/graphql",
+            "description": "Requires `GRAPHQL_INTROSPECTION` enabled on the API."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

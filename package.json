@@ -9,7 +9,20 @@
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,yml,yaml}\"",
     "test": "turbo run type-check test",
     "type-check": "turbo run type-check",
-    "prepare": "husky"
+    "validate": "./scripts/validate.sh",
+    "seed": "pnpm --filter api db:seed",
+    "prepare": "husky",
+    "kill-ports": "npx kill-port 3000 3001",
+    "dev:clean": "pnpm kill-ports && pnpm dev"
+  },
+  "pnpm": {
+    "overrides": {
+      "react": "18.3.1",
+      "react-dom": "18.3.1",
+      "@types/react": "18.3.12",
+      "@types/react-dom": "18.3.1",
+      "drizzle-kit": "0.20.18"
+    }
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx}": [

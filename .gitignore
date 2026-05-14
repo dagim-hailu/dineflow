@@ -4,6 +4,24 @@
 node_modules
 .pnp
 .pnp.js
+.pnpm-store
+.trae
+.vercel
+.husky
+.github
+bu
+build
+dist
+.next
+.turbo
+.vercel
+.husky
+.github
+build
+dist
+
+docs
+
 
 # Local env files
 .env
@@ -36,3 +54,10 @@ yarn-error.log*
 # Misc
 .DS_Store
 *.pem
+
+# Archives and Large Files
+*.rar
+*.zip
+*.tar
+*.tar.gz
+*.7z

@@ -6,3 +6,9 @@ node_modules
 .next
 apps/**/node_modules
 **/*.log
+
+*.rar
+*.zip
+*.tar
+*.tar.gz
+*.7z

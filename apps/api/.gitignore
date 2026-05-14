@@ -1,1 +1,63 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# Dependencies
+node_modules
+.pnp
+.pnp.js
+.pnpm-store
+.trae
 .vercel
+.husky
+.github
+bu
+build
+dist
+.next
+.turbo
+.vercel
+.husky
+.github
+build
+dist
+
+docs
+
+
+# Local env files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Testing
+coverage
+
+# Turbo
+.turbo
+
+# Vercel
+.vercel
+
+# Build Outputs
+.next/
+out/
+build
+dist
+
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Misc
+.DS_Store
+*.pem
+
+# Archives and Large Files
+*.rar
+*.zip
+*.tar
+*.tar.gz
+*.7z

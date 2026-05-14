@@ -34,3 +34,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Archives and Large Files
+*.rar
+*.zip
+*.tar
+*.tar.gz
+*.7z

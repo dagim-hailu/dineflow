@@ -44,6 +44,12 @@ const nextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: '*.onrender.com',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
   async headers() {

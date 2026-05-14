@@ -1,16 +1,37 @@
 #!/bin/sh
 set -e
 
-echo "Waiting for PostgreSQL on postgres:5432..."
-i=0
-while ! nc -z postgres 5432; do
-  i=$((i + 1))
-  if [ "$i" -gt 60 ]; then
-    echo "Postgres did not become ready in time" >&2
-    exit 1
+# Wait for database if specified
+if [ -n "$DATABASE_URL" ]; then
+  # Extract host and port from DATABASE_URL
+  # e.g., postgres://user:pass@host:port/db
+  DB_HOST=$(echo $DATABASE_URL | sed -e 's|.*@||' -e 's|/.*||' -e 's|:.*||')
+  DB_PORT=$(echo $DATABASE_URL | sed -e 's|.*@||' -e 's|/.*||' -e 's|.*:||')
+  
+  if [ -n "$DB_HOST" ] && [ -n "$DB_PORT" ]; then
+    echo "Waiting for PostgreSQL on $DB_HOST:$DB_PORT..."
+    i=0
+    while ! nc -z "$DB_HOST" "$DB_PORT"; do
+      i=$((i + 1))
+      if [ "$i" -gt 60 ]; then
+        echo "Postgres ($DB_HOST:$DB_PORT) did not become ready in time" >&2
+        exit 1
+      fi
+      sleep 1
+    done
   fi
-  sleep 1
-done
+elif [ -n "$POSTGRES_HOST" ]; then
+  echo "Waiting for PostgreSQL on $POSTGRES_HOST:5432..."
+  i=0
+  while ! nc -z "$POSTGRES_HOST" 5432; do
+    i=$((i + 1))
+    if [ "$i" -gt 60 ]; then
+      echo "Postgres did not become ready in time" >&2
+      exit 1
+    fi
+    sleep 1
+  done
+fi
 
 echo "Applying database schema (drizzle-kit push:pg)..."
 DRIZZLE_KIT_BIN="$(find /app/node_modules/.pnpm -path '*/drizzle-kit@*/node_modules/drizzle-kit/bin.cjs' 2>/dev/null | head -1)"

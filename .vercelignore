@@ -1,14 +1,11 @@
-dineflow.rar
-dineflow_V2.rar
-node_modules
-.git
-.turbo
-.next
-apps/**/node_modules
-**/*.log
-
-*.rar
-*.zip
-*.tar
-*.tar.gz
-*.7z
+# Ignore everything except the web app and shared packages
+*
+!apps/web/**
+!packages/**
+!package.json
+!pnpm-lock.yaml
+!pnpm-workspace.yaml
+!turbo.json
+!apps/web/package.json
+!apps/web/next.config.mjs
+!apps/web/.next

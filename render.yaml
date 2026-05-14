@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: dineflow-api
+    runtime: docker
+    plan: free
+    region: oregon # or your preferred region
+    dockerContext: .
+    dockerFilePath: apps/api/Dockerfile
+    healthCheckPath: /health # Check if your API has a health endpoint
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3001
+      - key: DATABASE_URL
+        fromDatabase:
+          name: dineflow-db
+          property: connectionString
+      - key: REDIS_URL
+        sync: false # Set manually after creating Upstash Redis
+      - key: FRONTEND_URL
+        sync: false # Set manually after creating Vercel project
+
+databases:
+  - name: dineflow-db
+    plan: free

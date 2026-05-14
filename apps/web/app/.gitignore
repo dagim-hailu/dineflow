@@ -92,3 +92,9 @@ yarn-error.log*
 .DS_Store
 *.pem
 
+# Archives and Large Files
+*.rar
+*.zip
+*.tar
+*.tar.gz
+*.7z

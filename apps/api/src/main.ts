@@ -48,7 +48,15 @@ async function bootstrap() {
     origin: parseCorsOrigins(),
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'Cookie',
+      'X-Requested-With',
+      'apollo-require-preflight',
+    ],
+    preflightContinue: false,
+    optionsSuccessStatus: 204,
   });
 
   app.use(cookieParser());
@@ -80,9 +88,10 @@ async function bootstrap() {
     });
   }
 
-  await app.listen(process.env.PORT ?? 3001);
+  const port = process.env.PORT ?? 3001;
+  await app.listen(port, '0.0.0.0');
   const url = await app.getUrl();
-  console.log(`Application is running on: ${url}`);
+  console.log(`Application is running on: ${url} (0.0.0.0)`);
   if (process.env.SWAGGER_ENABLED !== 'false') {
     console.log(`Swagger UI: ${url}/api/docs`);
   }

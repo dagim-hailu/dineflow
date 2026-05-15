@@ -53,6 +53,8 @@ export default function LoginPage() {
         router.push('/kitchen');
       } else if (role === 'waiter') {
         router.push('/waiter');
+      } else if (role === 'customer') {
+        router.push('/orders');
       } else {
         router.push('/');
       }

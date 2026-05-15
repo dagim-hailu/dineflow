@@ -53,6 +53,7 @@ async function bootstrap() {
       'Authorization',
       'Cookie',
       'X-Requested-With',
+      'x-guest-token',
       'apollo-require-preflight',
     ],
     preflightContinue: false,

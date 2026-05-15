@@ -7,33 +7,36 @@ import { augmentOpenApiWithGraphql } from './docs/augment-openapi-graphql';
 
 function parseCorsOrigins(): string | boolean | string[] {
   const raw = process.env.CORS_ORIGINS || process.env.FRONTEND_URL;
+  console.log('CORS Debug: raw environment value:', raw);
+
   if (!raw) {
     return [
       'http://localhost',
-      'http://localhost:80',
       'http://localhost:3000',
-      'http://127.0.0.1',
-      'http://127.0.0.1:80',
       'http://127.0.0.1:3000',
     ];
   }
+
+  // Split, trim, and remove trailing slashes for exact origin matching
   const list = raw
     .split(',')
-    .map((s) => s.trim())
+    .map((s) => s.trim().replace(/\/$/, ''))
     .filter(Boolean);
+
   if (list.length === 0) return true;
-  const merged = list.length === 1 ? [list[0]!] : [...list];
+
+  const merged = [...list];
   const extras = [
     'http://localhost',
-    'http://localhost:80',
     'http://localhost:3000',
-    'http://127.0.0.1',
-    'http://127.0.0.1:80',
     'http://127.0.0.1:3000',
   ];
+
   for (const o of extras) {
     if (!merged.includes(o)) merged.push(o);
   }
+
+  console.log('CORS Debug: Final allowed origins:', merged);
   return merged;
 }
 

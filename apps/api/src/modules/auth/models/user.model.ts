@@ -44,6 +44,9 @@ export class User {
 export class AuthPayload {
   @Field(() => User)
   user!: User;
+
+  @Field({ nullable: true })
+  accessToken?: string;
 }
 
 @ObjectType()

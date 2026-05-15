@@ -17,6 +17,7 @@ export interface CartItem {
 interface CartState {
   items: CartItem[];
   tableId: string | null;
+  guestToken: string | null;
   isLoading: boolean;
   error: string | null;
   /** Whether a server-side guest session has been established */
@@ -35,10 +36,11 @@ interface CartState {
 
 /** Calls guestSession mutation to set the dineflow_guest HTTP-only cookie */
 async function initGuestSession(tableId: string) {
-  await apolloClient.mutate({
+  const { data } = await apolloClient.mutate({
     mutation: GUEST_SESSION,
     variables: { input: { tableId } },
   });
+  return data.guestSession.token;
 }
 
 export const useCartStore = create<CartState>()(
@@ -46,6 +48,7 @@ export const useCartStore = create<CartState>()(
     (set, get) => ({
       items: [],
       tableId: null,
+      guestToken: null,
       isLoading: false,
       error: null,
       guestSessionReady: false,
@@ -53,10 +56,10 @@ export const useCartStore = create<CartState>()(
       setTableId: (tableId) => set({ tableId }),
 
       ensureGuestSession: async (tableId: string) => {
-        if (get().guestSessionReady) return;
+        if (get().guestSessionReady && get().guestToken) return;
         try {
-          await initGuestSession(tableId);
-          set({ guestSessionReady: true });
+          const token = await initGuestSession(tableId);
+          set({ guestToken: token, guestSessionReady: true });
         } catch (err) {
           console.warn('[CartStore] Guest session init failed:', err);
         }
@@ -159,7 +162,11 @@ export const useCartStore = create<CartState>()(
     }),
     {
       name: 'dineflow-cart',
-      partialize: (state) => ({ items: state.items, tableId: state.tableId }),
+      partialize: (state) => ({
+        items: state.items,
+        tableId: state.tableId,
+        guestToken: state.guestToken,
+      }),
     },
   ),
 );

@@ -8,9 +8,10 @@ import { JwtPayload } from '../auth.service';
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(private readonly authService: AuthService) {
     super({
-      jwtFromRequest: (req) => {
-        return req.cookies?.dineflow_token || null;
-      },
+      jwtFromRequest: ExtractJwt.fromExtractors([
+        (req: any) => req.cookies?.dineflow_token || null,
+        ExtractJwt.fromAuthHeaderAsBearerToken(),
+      ]),
       ignoreExpiration: false,
       secretOrKey: process.env.JWT_SECRET || 'default-secret',
     });

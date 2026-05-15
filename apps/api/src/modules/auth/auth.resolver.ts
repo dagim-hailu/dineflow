@@ -38,7 +38,7 @@ export class AuthResolver {
         maxAge: user.role === 'customer' ? 30 * 24 * 60 * 60 * 1000 : 24 * 60 * 60 * 1000,
       });
 
-      return { user };
+      return { user, accessToken };
     } catch (error) {
       throw error;
     }
@@ -62,7 +62,7 @@ export class AuthResolver {
         maxAge: user.role === 'customer' ? 30 * 24 * 60 * 60 * 1000 : 24 * 60 * 60 * 1000,
       });
 
-      return { user };
+      return { user, accessToken };
     } catch (error) {
       throw error;
     }

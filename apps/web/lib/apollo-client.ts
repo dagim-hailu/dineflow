@@ -35,11 +35,36 @@ const wsLink =
       )
     : null;
 
-const authLink = setContext((_, { headers }) => ({
-  headers: {
-    ...headers,
-  },
-}));
+const authLink = setContext((_, { headers }) => {
+  let guestToken = null;
+  let accessToken = null;
+
+  if (typeof window !== 'undefined') {
+    // Read from CartStore persistence
+    const cartStore = localStorage.getItem('dineflow-cart');
+    if (cartStore) {
+      try {
+        guestToken = JSON.parse(cartStore).state.guestToken;
+      } catch (e) {}
+    }
+
+    // Read from AuthStore persistence
+    const authStore = localStorage.getItem('dineflow-auth');
+    if (authStore) {
+      try {
+        accessToken = JSON.parse(authStore).state.accessToken;
+      } catch (e) {}
+    }
+  }
+
+  return {
+    headers: {
+      ...headers,
+      ...(guestToken ? { 'x-guest-token': guestToken } : {}),
+      ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+    },
+  };
+});
 
 const errorLink = onError(({ graphQLErrors, networkError }) => {
   if (graphQLErrors)

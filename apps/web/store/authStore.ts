@@ -14,6 +14,7 @@ export interface User {
 
 interface AuthState {
   user: User | null;
+  accessToken: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
@@ -28,6 +29,7 @@ export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
       user: null,
+      accessToken: null,
       isAuthenticated: false,
       isLoading: false,
       error: null,
@@ -44,6 +46,7 @@ export const useAuthStore = create<AuthState>()(
 
           set({
             user: data.login.user,
+            accessToken: data.login.accessToken,
             isAuthenticated: true,
             error: null,
           });
@@ -52,6 +55,7 @@ export const useAuthStore = create<AuthState>()(
             error: error instanceof Error ? error.message : 'Login failed',
             isAuthenticated: false,
             user: null,
+            accessToken: null,
           });
           throw error;
         } finally {
@@ -69,6 +73,7 @@ export const useAuthStore = create<AuthState>()(
 
           set({
             user: data.register.user,
+            accessToken: data.register.accessToken,
             isAuthenticated: true,
             error: null,
           });
@@ -77,6 +82,7 @@ export const useAuthStore = create<AuthState>()(
             error: error instanceof Error ? error.message : 'Registration failed',
             isAuthenticated: false,
             user: null,
+            accessToken: null,
           });
           throw error;
         } finally {
@@ -95,6 +101,7 @@ export const useAuthStore = create<AuthState>()(
         } finally {
           set({
             user: null,
+            accessToken: null,
             isAuthenticated: false,
             isLoading: false,
             error: null,
@@ -120,6 +127,7 @@ export const useAuthStore = create<AuthState>()(
         } catch (error) {
           set({
             user: null,
+            accessToken: null,
             isAuthenticated: false,
             error: null, // Don't show error for auto-fetch
           });
@@ -134,6 +142,7 @@ export const useAuthStore = create<AuthState>()(
       name: 'dineflow-auth',
       partialize: (state) => ({
         user: state.user,
+        accessToken: state.accessToken,
         isAuthenticated: state.isAuthenticated,
       }),
     },

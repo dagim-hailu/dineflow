@@ -3,6 +3,7 @@ import { gql } from '@apollo/client';
 export const GUEST_SESSION = gql`
   mutation GuestSession($input: GuestSessionInput!) {
     guestSession(input: $input) {
+      token
       sessionId
       expiresAt
     }

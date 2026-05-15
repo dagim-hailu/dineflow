@@ -314,17 +314,21 @@ export class OrderService {
 
     // Emit WebSocket event for new order
     if (newOrder) {
-      this.eventsGateway.emitOrderPlaced({
-        orderId: newOrder.id,
-        tableId: newOrder.tableId,
-        restaurantId: newOrder.restaurantId,
-        items: orderItemsData.map((item) => ({
-          name: menuItemsList.find((mi) => mi.id === item.menuItemId)?.name || 'Unknown Item',
-          quantity: item.quantity,
-        })),
-        totalAmount: totalAmount,
-        createdAt: newOrder.createdAt || new Date(),
-      });
+      try {
+        this.eventsGateway.emitOrderPlaced({
+          orderId: newOrder.id,
+          tableId: newOrder.tableId,
+          restaurantId: newOrder.restaurantId,
+          items: orderItemsData.map((item) => ({
+            name: menuItemsList.find((mi) => mi.id === item.menuItemId)?.name || 'Unknown Item',
+            quantity: item.quantity,
+          })),
+          totalAmount: totalAmount,
+          createdAt: newOrder.createdAt || new Date(),
+        });
+      } catch (wsError) {
+        console.error('[OrderService] Failed to emit order placed event:', wsError);
+      }
     }
 
     return this.getOrderWithDetails(newOrder.id);

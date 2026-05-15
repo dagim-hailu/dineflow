@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { CartDrawer } from '@/components/menu/CartDrawer';
 import { LanguageSwitcher } from '@/components/language-switcher';
+import { useAuthStore } from '@/store/authStore';
 
 function navLinkClass(active: boolean) {
   return cn(
@@ -27,6 +28,7 @@ export function SiteNavbar({ variant = 'default' }: { variant?: SiteNavbarVarian
   const [dropdown, setDropdown] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const t = useTranslations('Navigation');
+  const { isAuthenticated, user } = useAuthStore();
 
   const pagesLinks = [
     { href: '/booking', label: t('bookTable') },
@@ -123,6 +125,18 @@ export function SiteNavbar({ variant = 'default' }: { variant?: SiteNavbarVarian
           <Button asChild className="ml-2 shadow-md">
             <Link href="/booking">{t('bookTable')}</Link>
           </Button>
+
+          {isAuthenticated ? (
+            <Button asChild variant="outline" className="ml-2 border-white/20 bg-white/10 text-white hover:bg-white/20 hover:text-white">
+              <Link href={user?.role === 'CUSTOMER' ? '/orders' : '/kitchen'}>
+                {t('dashboard')}
+              </Link>
+            </Button>
+          ) : (
+            <Button asChild variant="outline" className="ml-2 border-white/20 bg-white/10 text-white hover:bg-white/20 hover:text-white">
+              <Link href="/login">{t('login')}</Link>
+            </Button>
+          )}
           <CartDrawer />
         </nav>
 
@@ -131,6 +145,17 @@ export function SiteNavbar({ variant = 'default' }: { variant?: SiteNavbarVarian
           <Button asChild size="sm" className="shadow-md">
             <Link href="/booking">{t('book')}</Link>
           </Button>
+          {isAuthenticated ? (
+            <Button asChild size="sm" variant="outline" className="border-white/20 bg-white/10 text-white hover:bg-white/20 hover:text-white">
+              <Link href={user?.role === 'CUSTOMER' ? '/orders' : '/kitchen'}>
+                {user?.role === 'CUSTOMER' ? t('orders') : t('dashboard')}
+              </Link>
+            </Button>
+          ) : (
+            <Button asChild size="sm" variant="outline" className="border-white/20 bg-white/10 text-white hover:bg-white/20 hover:text-white">
+              <Link href="/login">{t('login')}</Link>
+            </Button>
+          )}
           <Button
             type="button"
             variant="ghost"

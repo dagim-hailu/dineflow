@@ -86,8 +86,9 @@ export class OrderResolver {
   }
 
   /** Kitchen display: returns PENDING + COOKING + READY orders for the restaurant. */
-  @Public()
   @Query(() => [Order], { name: 'kitchenOrders' })
+  @UseGuards(GqlAuthGuard, RolesGuard)
+  @Roles(UserRole.WAITER, UserRole.KITCHEN, UserRole.MANAGER, UserRole.ADMIN)
   async getKitchenOrders(
     @Args('restaurantId', { type: () => ID, nullable: true }) restaurantId?: string,
   ): Promise<Order[]> {

@@ -1,6 +1,7 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-custom';
+import { UserRole } from '../models/user.model';
 import { AuthService } from '../auth.service';
 
 @Injectable()
@@ -23,6 +24,7 @@ export class GuestTokenStrategy extends PassportStrategy(Strategy, 'guest-token'
         sessionId: payload.sessionId,
         tableId: payload.tableId,
         type: 'guest',
+        role: UserRole.CUSTOMER,
       };
     } catch (error) {
       throw new UnauthorizedException('Invalid guest token');

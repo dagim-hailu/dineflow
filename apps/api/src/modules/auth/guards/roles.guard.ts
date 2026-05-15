@@ -20,12 +20,17 @@ export class RolesGuard implements CanActivate {
     const ctx = GqlExecutionContext.create(context);
     const user = ctx.getContext().req.user;
 
+    console.log('[RolesGuard] Checking roles for user:', user?.id, 'Role:', user?.role);
+    console.log('[RolesGuard] Required roles:', requiredRoles);
+
     if (!user) {
+      console.log('[RolesGuard] No user found in request');
       throw new ForbiddenException('User not authenticated');
     }
 
     const hasRole = requiredRoles.includes(user.role);
     if (!hasRole) {
+      console.log('[RolesGuard] Role mismatch. User role:', user.role, 'is not in:', requiredRoles);
       throw new ForbiddenException('Insufficient permissions');
     }
 

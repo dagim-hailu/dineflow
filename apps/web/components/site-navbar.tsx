@@ -128,7 +128,14 @@ export function SiteNavbar({ variant = 'default' }: { variant?: SiteNavbarVarian
 
           {isAuthenticated ? (
             <Button asChild variant="outline" className="ml-2 border-white/20 bg-white/10 text-white hover:bg-white/20 hover:text-white">
-              <Link href={user?.role === 'CUSTOMER' ? '/orders' : '/kitchen'}>
+              <Link href={(() => {
+                const role = user?.role?.toLowerCase();
+                if (role === 'admin' || role === 'manager') return '/manager';
+                if (role === 'waiter') return '/waiter';
+                if (role === 'kitchen') return '/kitchen';
+                if (role === 'customer') return '/orders';
+                return '/kitchen'; // fallback
+              })()}>
                 {t('dashboard')}
               </Link>
             </Button>

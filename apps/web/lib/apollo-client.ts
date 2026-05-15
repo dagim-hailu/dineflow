@@ -41,19 +41,25 @@ const authLink = setContext((_, { headers }) => {
 
   if (typeof window !== 'undefined') {
     // Read from CartStore persistence
-    const cartStore = localStorage.getItem('dineflow-cart');
-    if (cartStore) {
+    const cartStoreRaw = localStorage.getItem('dineflow-cart');
+    if (cartStoreRaw) {
       try {
-        guestToken = JSON.parse(cartStore).state.guestToken;
-      } catch (e) {}
+        const cartStore = JSON.parse(cartStoreRaw);
+        guestToken = cartStore?.state?.guestToken || null;
+      } catch (e) {
+        console.warn('[Apollo] Failed to parse cart store:', e);
+      }
     }
 
     // Read from AuthStore persistence
-    const authStore = localStorage.getItem('dineflow-auth');
-    if (authStore) {
+    const authStoreRaw = localStorage.getItem('dineflow-auth');
+    if (authStoreRaw) {
       try {
-        accessToken = JSON.parse(authStore).state.accessToken;
-      } catch (e) {}
+        const authStore = JSON.parse(authStoreRaw);
+        accessToken = authStore?.state?.accessToken || null;
+      } catch (e) {
+        console.warn('[Apollo] Failed to parse auth store:', e);
+      }
     }
   }
 

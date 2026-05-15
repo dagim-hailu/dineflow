@@ -11,7 +11,7 @@ export class GuestTokenStrategy extends PassportStrategy(Strategy, 'guest-token'
 
   async validate(request: any): Promise<any> {
     try {
-      const token = request.cookies?.dineflow_guest;
+      const token = request.cookies?.dineflow_guest || request.headers?.['x-guest-token'];
       if (!token) {
         throw new UnauthorizedException('No guest token found');
       }

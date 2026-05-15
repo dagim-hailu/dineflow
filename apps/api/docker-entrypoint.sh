@@ -3,12 +3,18 @@ set -e
 
 # Wait for database if specified
 if [ -n "$DATABASE_URL" ]; then
-  # Extract host and port from DATABASE_URL
-  # e.g., postgres://user:pass@host:port/db
-  DB_HOST=$(echo $DATABASE_URL | sed -e 's|.*@||' -e 's|/.*||' -e 's|:.*||')
-  DB_PORT=$(echo $DATABASE_URL | sed -e 's|.*@||' -e 's|/.*||' -e 's|.*:||')
+  # Extract host:port or host from DATABASE_URL
+  HOST_PORT=$(echo "$DATABASE_URL" | sed -e 's|.*@||' -e 's|/.*||')
   
-  if [ -n "$DB_HOST" ] && [ -n "$DB_PORT" ]; then
+  if echo "$HOST_PORT" | grep -q ":"; then
+    DB_HOST=$(echo "$HOST_PORT" | cut -d: -f1)
+    DB_PORT=$(echo "$HOST_PORT" | cut -d: -f2)
+  else
+    DB_HOST="$HOST_PORT"
+    DB_PORT=5432
+  fi
+  
+  if [ -n "$DB_HOST" ]; then
     echo "Waiting for PostgreSQL on $DB_HOST:$DB_PORT..."
     i=0
     while ! nc -z "$DB_HOST" "$DB_PORT"; do

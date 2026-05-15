@@ -60,8 +60,8 @@ export function SiteNavbar({ variant = 'default' }: { variant?: SiteNavbarVarian
             <Image 
               src="/logo.png" 
               alt="Cook Solution" 
-              width={160} 
-              height={50} 
+              width={64} 
+              height={64} 
               className="h-12 w-auto object-contain" 
               priority
             />

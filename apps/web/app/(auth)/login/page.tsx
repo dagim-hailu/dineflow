@@ -77,9 +77,9 @@ export default function LoginPage() {
             <Image 
               src="/logo.png" 
               alt="Cook Solution" 
-              width={200} 
-              height={60} 
-              className="h-16 w-auto mx-auto object-contain bg-white rounded-xl p-2" 
+              width={120} 
+              height={120} 
+              className="h-20 w-auto mx-auto object-contain bg-white rounded-xl p-2" 
             />
           </Link>
           <p className="text-gray-300">{t('signInSub')}</p>

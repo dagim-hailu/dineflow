@@ -17,24 +17,25 @@ function parseCorsOrigins(): string | boolean | string[] {
     ];
   }
 
-  // Split, trim, and remove trailing slashes for exact origin matching
+  // Split, trim, and ensure protocol is present
   const list = raw
     .split(',')
     .map((s) => s.trim().replace(/\/$/, ''))
-    .filter(Boolean);
+    .filter(Boolean)
+    .map((s) => {
+      if (!s.startsWith('http')) {
+        return `https://${s}`;
+      }
+      return s;
+    });
 
-  if (list.length === 0) return true;
-
-  const merged = [...list];
   const extras = [
     'http://localhost',
     'http://localhost:3000',
     'http://127.0.0.1:3000',
   ];
 
-  for (const o of extras) {
-    if (!merged.includes(o)) merged.push(o);
-  }
+  const merged = [...new Set([...list, ...extras])];
 
   console.log('CORS Debug: Final allowed origins:', merged);
   return merged;

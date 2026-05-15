@@ -434,11 +434,17 @@ export class OrderService {
     return this.getOrderWithDetails(orderId);
   }
 
-  async getMyOrders(userId: string) {
+  async getMyOrders(userId?: string, guestId?: string) {
+    const conditions = [];
+    if (userId) conditions.push(eq(orders.userId, userId));
+    if (guestId) conditions.push(eq(orders.guestId, guestId));
+
+    if (conditions.length === 0) return [];
+
     const userOrders = await this.databaseService.db
       .select()
       .from(orders)
-      .where(eq(orders.userId, userId))
+      .where(or(...conditions))
       .orderBy(orders.createdAt);
 
     return Promise.all(userOrders.map((order) => this.getOrderWithDetails(order.id)));

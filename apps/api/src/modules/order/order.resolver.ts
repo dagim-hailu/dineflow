@@ -17,7 +17,7 @@ export class OrderResolver {
   constructor(private readonly orderService: OrderService) {}
 
   private getGuestId(request: any): string | undefined {
-    return request.cookies?.dineflow_guest;
+    return request.cookies?.dineflow_guest || request.headers?.['x-guest-token'];
   }
 
   // ─── Cart ───────────────────────────────────────────────────────────────────
@@ -78,10 +78,11 @@ export class OrderResolver {
     return this.orderService.getOrder(id);
   }
 
-  @UseGuards(GqlAuthGuard)
+  @Public()
   @Query(() => [Order], { name: 'myOrders' })
-  async getMyOrders(@CurrentUser() user: any): Promise<Order[]> {
-    return this.orderService.getMyOrders(user.id);
+  async getMyOrders(@Context() context: any, @CurrentUser() user?: any): Promise<Order[]> {
+    const guestId = this.getGuestId(context.req);
+    return this.orderService.getMyOrders(user?.id, guestId);
   }
 
   /** Kitchen display: returns PENDING + COOKING + READY orders for the restaurant. */

@@ -1,6 +1,6 @@
 {
-  "name": "DineFlow",
-  "short_name": "DineFlow",
+  "name": "Cook Solution",
+  "short_name": "Cook Solution",
   "description": "Modern restaurant ordering, table service, and realtime updates.",
   "start_url": "/",
   "scope": "/",

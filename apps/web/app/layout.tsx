@@ -21,15 +21,15 @@ const notoSansEthiopic = Noto_Sans_Ethiopic({
 });
 
 export const metadata: Metadata = {
-  title: 'DineFlow',
-  description: 'DineFlow - Modern Restaurant Ordering System',
+  title: 'Cook Solution',
+  description: 'Cook Solution - Modern Restaurant Ordering System',
   manifest: '/manifest.json',
-  applicationName: 'DineFlow',
+  applicationName: 'Cook Solution',
   themeColor: '#F59E0B',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: 'DineFlow',
+    title: 'Cook Solution',
   },
 };
 

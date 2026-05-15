@@ -30,6 +30,7 @@ import {
 import { GET_PAGINATED_USERS } from '@/lib/graphql/auth';
 import { Search, Filter as FilterIcon, ChevronLeft, ChevronRight } from 'lucide-react';
 import { LanguageSwitcher } from '@/components/language-switcher';
+import { StaffHeader } from '@/components/staff-header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -251,16 +252,15 @@ export default function ManagerDashboardPage() {
   ] as const;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-orange-100 p-4 sm:p-6">
-      <div className="mx-auto max-w-6xl">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-orange-100 pb-12">
+      <StaffHeader title={t('menuAdmin')} icon={<Crown className="h-5 w-5 text-primary" />} />
+      
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 mt-8">
         {/* ── Admin Container ── */}
         <div className="overflow-hidden rounded-2xl bg-white shadow-[0_20px_60px_rgba(0,0,0,0.3)]">
-          {/* Header */}
-          <div className="bg-gradient-to-r from-primary to-orange-500 px-8 py-8 text-white text-center">
-            <h1 className="flex items-center justify-center gap-4 text-4xl font-bold">
-              <Crown className="h-9 w-9" /> {t('menuAdmin')}
-            </h1>
-            <p className="mt-2 opacity-90 text-lg">{t('manageMenu')}</p>
+          {/* Header Description */}
+          <div className="bg-gradient-to-r from-primary/10 to-orange-500/10 px-8 py-6 border-b border-primary/10 text-center">
+            <p className="opacity-90 text-lg font-medium text-primary">{t('manageMenu')}</p>
           </div>
 
           {/* QR / View menu link */}

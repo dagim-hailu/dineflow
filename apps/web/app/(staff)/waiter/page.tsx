@@ -8,6 +8,7 @@ import { LanguageSwitcher } from '@/components/language-switcher';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { RefreshCw, BellRing, Utensils, Check, Loader2, Circle } from 'lucide-react';
+import { StaffHeader } from '@/components/staff-header';
 import { GET_TABLES } from '@/lib/graphql/tables';
 import { useSocket, OrderNewEvent, OrderStatusEvent } from '@/hooks/useSocket';
 
@@ -78,20 +79,20 @@ export default function WaiterDashboardPage() {
   const tables: TableRow[] = data?.tables ?? [];
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8 flex flex-col items-center">
-      <Card className="w-full max-w-5xl shadow-lg">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-3xl font-bold flex items-center gap-2">
-            <Utensils className="h-7 w-7 text-amber-500" /> {t('waiterDashboard')}
-          </CardTitle>
-          <div className="flex items-center gap-4">
-            <LanguageSwitcher />
+    <div className="min-h-screen bg-gray-50 pb-12">
+      <StaffHeader title={t('waiterDashboard')} icon={<Utensils className="h-5 w-5 text-amber-500" />} />
+      
+      <div className="mx-auto max-w-5xl px-4 sm:px-6 mt-8">
+        <Card className="w-full shadow-lg">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-xl font-bold">
+              {t('tableStatus')}
+            </CardTitle>
             <Button variant="outline" size="sm" onClick={() => refetch()} disabled={loading}>
               <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
               <span className="ml-2">{t('refresh')}</span>
             </Button>
-          </div>
-        </CardHeader>
+          </CardHeader>
         <CardContent className="pt-4 space-y-8">
           {/* Table Grid */}
           <section>
@@ -174,6 +175,7 @@ export default function WaiterDashboardPage() {
           </section>
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 }

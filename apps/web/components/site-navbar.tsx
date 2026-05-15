@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -55,9 +56,15 @@ export function SiteNavbar({ variant = 'default' }: { variant?: SiteNavbarVarian
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
         <div className="flex items-center gap-4">
-          <Link href="/" className="flex items-center gap-2 text-lg font-bold tracking-tight">
-            <UtensilsCrossed className="h-7 w-7 shrink-0 text-primary" aria-hidden />
-            <span className="font-display text-white">DineFlow</span>
+          <Link href="/" className="flex items-center gap-2">
+            <Image 
+              src="/logo.png" 
+              alt="Cook Solution" 
+              width={160} 
+              height={50} 
+              className="h-12 w-auto object-contain" 
+              priority
+            />
           </Link>
           <LanguageSwitcher className="border-white/10" />
         </div>

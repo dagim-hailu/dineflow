@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
@@ -61,10 +62,15 @@ export default function RegisterPage() {
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-[#F59E0B] rounded-2xl mb-4">
-            <span className="text-2xl font-black text-white">DF</span>
-          </div>
-          <h1 className="text-3xl font-black text-white mb-2">DineFlow</h1>
+          <Link href="/" className="inline-block mb-4">
+            <Image 
+              src="/logo.png" 
+              alt="Cook Solution" 
+              width={200} 
+              height={60} 
+              className="h-16 w-auto mx-auto object-contain bg-white rounded-xl p-2" 
+            />
+          </Link>
           <p className="text-gray-300">{t('createAccount')}</p>
         </div>
 

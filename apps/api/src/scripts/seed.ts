@@ -40,32 +40,46 @@ async function main() {
   const passwordHash = await bcrypt.hash('password', 12);
 
   // ── Users ────────────────────────────────────────────────────────────────
-  const [existingDemoUser] = await db
-    .select()
-    .from(users)
-    .where(eq(users.email, 'test@example.com'))
-    .limit(1);
-  if (!existingDemoUser) {
-    await db
-      .insert(users)
-      .values({ name: 'Test User', email: 'test@example.com', passwordHash, role: 'customer' });
-    console.log('Created user test@example.com / password');
-  } else {
-    console.log('User test@example.com already exists — skipping user insert');
+  const roles: Array<'customer' | 'waiter' | 'kitchen' | 'manager' | 'admin'> = [
+    'customer',
+    'waiter',
+    'kitchen',
+    'manager',
+    'admin',
+  ];
+
+  for (const role of roles) {
+    for (let i = 1; i <= 13; i++) {
+      const email = `${role}${i}@example.com`;
+      const name = `${role.charAt(0).toUpperCase() + role.slice(1)} ${i}`;
+
+      const [existing] = await db.select().from(users).where(eq(users.email, email)).limit(1);
+
+      if (!existing) {
+        await db.insert(users).values({
+          name,
+          email,
+          passwordHash,
+          role,
+        });
+        console.log(`Created user ${email} (role: ${role})`);
+      }
+    }
   }
 
-  const staffUsers = [
+  // Add the specific test users if they don't exist
+  const specialUsers = [
+    { name: 'Test User', email: 'test@example.com', role: 'customer' as const },
     { name: 'Demo Manager', email: 'manager@example.com', role: 'manager' as const },
     { name: 'Demo Waiter', email: 'waiter@example.com', role: 'waiter' as const },
     { name: 'Demo Kitchen', email: 'kitchen@example.com', role: 'kitchen' as const },
   ];
-  for (const s of staffUsers) {
+
+  for (const s of specialUsers) {
     const [existing] = await db.select().from(users).where(eq(users.email, s.email)).limit(1);
     if (!existing) {
       await db.insert(users).values({ name: s.name, email: s.email, passwordHash, role: s.role });
-      console.log(`Created staff user ${s.email} (role: ${s.role})`);
-    } else {
-      console.log(`Staff user ${s.email} already exists — skipping`);
+      console.log(`Created special user ${s.email} (role: ${s.role})`);
     }
   }
 
@@ -573,9 +587,64 @@ async function main() {
       imageUrl:
         'https://images.unsplash.com/photo-1560762484-813fc97650a0?w=480&h=320&fit=crop&q=80',
     },
+    {
+      restaurantId: rid,
+      categoryId: drinksCat.id,
+      name: 'Ethiopian Espresso',
+      description: 'Single-origin Yirgacheffe beans, notes of jasmine and citrus',
+      price: '4.50',
+      prepTime: 4,
+      isAvailable: true,
+      imageUrl:
+        'https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?w=480&h=320&fit=crop&q=80',
+    },
+    {
+      restaurantId: rid,
+      categoryId: drinksCat.id,
+      name: 'Hibiscus Iced Tea',
+      description: 'Cold-brewed hibiscus flowers, touch of honey and fresh mint',
+      price: '5.50',
+      prepTime: 5,
+      isAvailable: true,
+      imageUrl:
+        'https://images.unsplash.com/photo-1553530666-ba11a7da3888?w=480&h=320&fit=crop&q=80',
+    },
+    {
+      restaurantId: rid,
+      categoryId: drinksCat.id,
+      name: 'Sparkling Mineral Water',
+      description: 'Natural carbonation, served with a slice of lime',
+      price: '4.00',
+      prepTime: 2,
+      isAvailable: true,
+      imageUrl:
+        'https://images.unsplash.com/photo-1548967036-d1593ef30864?w=480&h=320&fit=crop&q=80',
+    },
+    {
+      restaurantId: rid,
+      categoryId: drinksCat.id,
+      name: 'Craft Beer (Lager)',
+      description: 'Local microbrewery lager, crisp and refreshing',
+      price: '8.00',
+      prepTime: 5,
+      isAvailable: true,
+      imageUrl:
+        'https://images.unsplash.com/photo-1535958636474-b021ee887b13?w=480&h=320&fit=crop&q=80',
+    },
+    {
+      restaurantId: rid,
+      categoryId: drinksCat.id,
+      name: 'Red Wine (Cabernet)',
+      description: 'Full-bodied red with notes of black cherry and oak',
+      price: '12.00',
+      prepTime: 5,
+      isAvailable: true,
+      imageUrl:
+        'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=480&h=320&fit=crop&q=80',
+    },
   ]);
 
-  console.log('Seeded 4 categories × 8 items = 32 menu items with Unsplash images');
+  console.log('Seeded 4 categories with a total of 13+ food/drink items each');
 
   await pool.end();
 

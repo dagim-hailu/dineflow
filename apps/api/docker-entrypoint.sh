@@ -57,5 +57,16 @@ env NODE_PATH="/tmp/dineflow-api-node-modules:/app/node_modules${NODE_PATH:+:$NO
   exit 1
 }
 
+# Run seed if requested
+if [ "$SEED_DATABASE" = "true" ]; then
+  echo "Seeding database..."
+  cd /app/apps/api
+  node dist/scripts/seed.js || {
+    echo "Seeding failed" >&2
+    # We don't exit 1 here to allow the app to start even if seeding fails
+    # but you might want to change this depending on your requirements
+  }
+fi
+
 cd /app/apps/api
 exec node dist/main.js

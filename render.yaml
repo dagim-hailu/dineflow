@@ -21,18 +21,6 @@ services:
       - key: FRONTEND_URL
         sync: false # Set manually after creating Vercel project
 
-  - type: job
-    name: dineflow-seed
-    runtime: docker
-    dockerContext: .
-    dockerfilePath: apps/api/Dockerfile
-    envVars:
-      - key: DATABASE_URL
-        fromDatabase:
-          name: dineflow-db
-          property: connectionString
-    startCommand: cd /app/apps/api && node dist/scripts/seed.js
-
 databases:
   - name: dineflow-db
     plan: free
